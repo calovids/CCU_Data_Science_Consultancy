@@ -1,0 +1,17 @@
+# Use an official lightweight base image
+FROM alpine:latest
+
+# Install wget
+RUN apk --no-cache add wget
+RUN apk --no-cache add git #leave it commented until asked to remove
+RUN apk --no-cache add feh
+
+
+# Working directory to download the images
+WORKDIR /usr/src/app
+
+# Download a small image
+RUN wget https://via.placeholder.com/150 -O small-image.png
+
+# List files to show the downloaded image
+CMD ["ls", "-l"]
