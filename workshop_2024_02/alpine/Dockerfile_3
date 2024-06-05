@@ -1,0 +1,14 @@
+# Use an official lightweight base image
+FROM alpine:latest
+
+# Install wget
+RUN apk --no-cache add wget
+
+# Working directory to download the images
+WORKDIR /usr/src/app
+
+# Download a small image
+RUN wget https://via.placeholder.com/150 -O small-image.png
+
+# Copy the figure to a new name and list files before and after
+CMD ls -l && cp small-image.png Copy.png && ls -l

@@ -1,0 +1,43 @@
+# Use the Jupyter base image as the starting point
+FROM quay.io/jupyter/base-notebook
+
+# Set the user to root to install packages and configure the system
+USER root
+
+# Install system dependencies
+RUN apt-get update 
+RUN apt-get install iputils-ping -y
+RUN apt-get install file -y
+RUN apt-get install ssh -y
+RUN apt-get install openssh-server -y
+RUN apt-get install xpra -y
+RUN apt-get install xterm -y
+RUN    rm -rf /var/lib/apt/lists/*
+
+# Install Python packages
+RUN pip install numpy 
+RUN pip install pandas 
+RUN pip install matplotlib
+RUN pip install torch 
+
+
+# Copy the customized start script
+COPY start-notebook.sh /usr/local/bin/start-notebook.sh
+RUN chmod +x /usr/local/bin/start-notebook.sh
+
+# Configure SSH for root login
+RUN echo 'root:A_very_strong_password' | chpasswd && \
+    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    mkdir /var/run/sshd
+
+# Expose the SSH port
+EXPOSE 22
+
+COPY start-notebook.sh /usr/local/bin/start-notebook.sh
+RUN chmod +x /usr/local/bin/start-notebook.sh
+
+
+CMD ["/usr/local/bin/start-notebook.sh"]
+
+USER root
+
