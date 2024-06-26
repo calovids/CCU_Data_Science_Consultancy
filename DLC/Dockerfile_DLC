@@ -1,0 +1,58 @@
+#FROM nvidia/cuda:11.0-cudnn8-runtime-ubuntu18.04
+FROM ubuntu:20.04
+
+RUN apt-get update
+RUN apt-get install python3 python3-pip  python3-dev libgl1-mesa-glx wget -y
+RUN python3 -m pip install --upgrade pip
+
+#Cuda installation
+RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
+RUN mv cuda-ubuntu2004.pin /etc/apt/preferences.d/cuda-repository-pin-600
+RUN wget https://developer.download.nvidia.com/compute/cuda/11.3.1/local_installers/cuda-repo-ubuntu2004-11-3-local_11.3.1-465.19.01-1_amd64.deb
+RUN dpkg -i cuda-repo-ubuntu2004-11-3-local_11.3.1-465.19.01-1_amd64.deb
+RUN rm cuda-repo-ubuntu2004-11-3-local_11.3.1-465.19.01-1_amd64.deb
+RUN apt-key add /var/cuda-repo-ubuntu2004-11-3-local/7fa2af80.pub
+RUN apt-get update
+RUN DEBIAN_FRONTEND=noninteractive apt-get install keyboard-configuration  locales tzdata -y
+RUN apt-get -y install cuda
+RUN apt-get install -y software-properties-common
+RUN add-apt-repository ppa:graphics-drivers/ppa
+RUN apt install nvidia-cuda-toolkit gcc-9 -y
+RUN apt install libcanberra-gtk-module libcanberra-gtk3-module
+
+
+
+#DLC installation
+RUN pip install deeplabcut[gui,tf]
+#RUN pip install tensorflow==2.4
+#RUN pip install numpy==1.22
+
+COPY First_Execute.sh /home/ 
+RUN apt update
+RUN apt install emacs -y
+
+
+#SSH instalation, Uncomment to use:
+
+#RUN  ssh openssh-server -y
+#RUN mkdir /var/run/sshd
+## Create a directory for SSH keys
+#RUN mkdir -p /root/.ssh
+## Copy the public key and set the proper permissions
+## Here is the sshkey file, change for your own use
+#COPY id_rsa.pub /root/.ssh/authorized_keys 
+#RUN chmod 700 /root/.ssh && chmod 600 /root/.ssh/authorized_keys
+## Configure SSH to permit root login with key authentication
+#RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config \
+#    && echo "PasswordAuthentication no" >> /etc/ssh/sshd_config \
+#    && echo "ChallengeResponseAuthentication no" >> /etc/ssh/sshd_config
+## Set up SSH access
+#RUN echo 'root:A_strong_Password_here' | chpasswd
+#RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+# Expose SSH port
+EXPOSE 22
+
+
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+CMD ["home/First_Execute.sh"]
