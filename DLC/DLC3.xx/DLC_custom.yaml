@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  namespace: user-daniel-calovi
+  name: daniel-calovi-deeplabcut
+spec:
+  containers:
+  - name: daniel-calovi-deeplab-ownssh
+    image: ccu-k8s.inf.uni-konstanz.de:32250/daniel.calovi/dlc30_ccu_xpra
+    command: ["/bin/bash","-c"]
+    args:
+    - |
+      /usr/sbin/sshd
+      while true; do sleep 3600; done; # Keeps container running
+    #args: ["while true; do sleep 30; done;"] # Keeps the container running
+    resources:
+      requests:
+        cpu: 10
+        nvidia.com/gpu: 1
+        memory: 100Gi
+      limits:
+        cpu: 10
+        nvidia.com/gpu: 1
+        memory: 100Gi
+    volumeMounts:
+      - mountPath: /abyss/home
+        name: cephfs-home
+        readOnly: false
+      - mountPath: /abyss/shared
+        name: cephfs-shared
+        readOnly: false
+      - mountPath: /abyss/datasets
+        name: cephfs-datasets
+        readOnly: true
+  imagePullSecrets:
+  - name: regcredjson      
+  volumes:
+    - name: cephfs-home
+      hostPath:
+        path: "/cephfs/abyss/home/daniel-calovi"
+        type: Directory
+    - name: cephfs-shared
+      hostPath:
+        path: "/cephfs/abyss/shared"
+        type: Directory
+    - name: cephfs-datasets
+      hostPath:
+        path: "/cephfs/abyss/datasets"
+        type: Directory

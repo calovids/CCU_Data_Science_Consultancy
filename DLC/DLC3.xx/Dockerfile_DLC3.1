@@ -1,0 +1,76 @@
+FROM continuumio/anaconda3
+
+# Update and install system-level dependencies
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y \
+        ffmpeg \
+        software-properties-common \
+        wget \
+        gnupg2 \
+        xterm \
+        git \
+        coreutils \
+        iputils-ping \
+        python3-uinput \
+        python3-avahi \
+        menu \
+        menu-xdg \
+        curl \
+        dbus \
+        python3-netifaces \
+        nano \
+        xpra
+
+# Clone and install Xpra HTML5 client
+RUN git clone https://github.com/Xpra-org/xpra-html5 && \
+    cd xpra-html5 && \
+    ./setup.py install
+
+# Copy CUDA repository package (assuming it's in the same directory as Dockerfile)
+COPY cuda-repo-debian12-12-6-local_12.6.2-560.35.03-1_amd64.deb /tmp/
+
+# Install CUDA toolkit
+RUN dpkg -i /tmp/cuda-repo-debian12-12-6-local_12.6.2-560.35.03-1_amd64.deb && \
+    cp /var/cuda-repo-debian12-12-6-local/cuda-*-keyring.gpg /usr/share/keyrings/ && \
+    add-apt-repository contrib && \
+    apt-get update && \
+    apt-get install -y cuda-toolkit-12-6 && \
+    rm -rf /var/lib/apt/lists/* /tmp/cuda-repo-debian12-12-6-local_12.6.2-560.35.03-1_amd64.deb
+
+# Set environment variable for XDG runtime
+ENV XDG_RUNTIME_DIR=/tmp/xdg_runtime_dir
+RUN mkdir -p $XDG_RUNTIME_DIR && chmod 700 $XDG_RUNTIME_DIR
+
+# Set NVIDIA container runtime for GPU support
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility,video
+
+# Work in the home directory
+WORKDIR /home/
+
+# Copy the DeepLabCut YAML configuration file for Conda environment setup
+COPY DEEPLABCUT.yaml /home/dlc.yaml
+
+# Remove existing Conda configuration (if any)
+RUN rm -f /root/.condarc
+
+# Copy .condarc for Conda configuration
+COPY .condarc /opt/conda/.condarc
+COPY .condarc /root/.condarc
+
+# Set Conda SSL verification
+ENV CONDA_SSL_VERIFY="true"
+
+# Create the Conda environment
+RUN conda env create -f /home/dlc.yaml
+
+# Expose ports for Xpra or any other services
+EXPOSE 10000
+
+# Copy the Execute script
+COPY Execute.sh /home/Execute.sh
+
+
+# Default command
+CMD ["bash", "-c", "while true; do sleep 1000; done"]
+
