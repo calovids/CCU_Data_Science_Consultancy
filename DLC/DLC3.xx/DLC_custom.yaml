@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  namespace: user-daniel-calovi
-  name: daniel-calovi-deeplabcut
+  namespace: user-name-lastname
+  name: ccu-deeplabcut-xpra
 spec:
   containers:
-  - name: daniel-calovi-deeplab-ownssh
-    image: ccu-k8s.inf.uni-konstanz.de:32250/daniel.calovi/dlc30_ccu_xpra
+  - name: ccu-dlc-xpra
+    image: ccu-k8s.inf.uni-konstanz.de:32250/your.username/dlc30_ccu_xpra
     command: ["/bin/bash","-c"]
     args:
     - |
@@ -37,7 +37,7 @@ spec:
   volumes:
     - name: cephfs-home
       hostPath:
-        path: "/cephfs/abyss/home/daniel-calovi"
+        path: "/cephfs/abyss/home/your-namespace"
         type: Directory
     - name: cephfs-shared
       hostPath:

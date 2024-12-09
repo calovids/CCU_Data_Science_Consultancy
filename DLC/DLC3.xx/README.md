@@ -44,7 +44,8 @@ docker exec -it dlc3_xpra /bin/sh
 
 ```localhost:10000 ```
 
-#### And you should be able to access the visual interface of DLC.
+#### And you should be able to access the visual interface of DLC in your local machine
 
-
+##### Last comments
+the references to .condarc might be removed from the script, but I was having issues with mirror connections when building it.
 
