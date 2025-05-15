@@ -14,11 +14,13 @@ If you already have access to our GPU cluster, simply download the file `DLC_30_
 
 
 1 - `kubectl apply -f DLC_30_Public.yaml` to submit your pod
+
 2 - `kubectl get pods` to check if your pod is being launched properly
+
 3 - `kubectl describe pods ccu-deeplabcut` to describe the launching off your pod, also match the name of the pod here with the one in the yaml file if you have changed it.
+
 4 - `kubectl exec -it ccu-deeplabcut -- /bin/bash` to log into into your pod
+
 4b - `bash Execute.sh` once inside the pod, run the initialization script, and confirm that the GPU is recognized properly.
+
 5 - In a different terminal on your local computer run `kubectl port-forward ccu-deeplabcut 10000:10000` and the proceed to open a browser and look at url `localhost:10000`
-
-
-
