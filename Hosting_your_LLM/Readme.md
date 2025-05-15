@@ -1,4 +1,4 @@
-#How to host your own LLM in our GPU clusters
+# How to host your own LLM in our GPU clusters
 
 
 If you want to host your private LLM instance, we have created the two tutorials below to help you.
