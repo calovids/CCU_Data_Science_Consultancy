@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: llama3-max-pod
+  namespace: user-name-space   #DSC change your name space here
+  labels:
+    app: llama3-max-pod
+spec:
+  nodeSelector:
+    kubernetes.io/hostname: asmodeus
+  tolerations:
+    - key: "gpumem"
+      operator: "Equal"
+      value: "80"
+      effect: "NoSchedule"
+  containers:
+    - name: llama3-max-container
+      image: docker.modular.com/modular/max-openai-api:latest
+      args:
+        - "--model-name"
+        - "modularai/Llama-3.1-8B-Instruct-GGUF"
+        - "--huggingface-repo-id"
+        - "modularai/Llama-3.1-8B-Instruct-GGUF"
+      resources:
+        requests:
+          cpu: "20"
+          nvidia.com/gpu: "1"
+          memory: "160Gi"
+        limits:
+          cpu: "20"
+          nvidia.com/gpu: "1"
+          memory: "160Gi"
+      volumeMounts:
+        - mountPath: /abyss/home
+          name: cephfs-home
+          readOnly: false
+        - mountPath: /abyss/shared
+          name: cephfs-shared
+          readOnly: false
+        - mountPath: /abyss/datasets
+          name: cephfs-datasets
+          readOnly: true
+      ports:
+        - containerPort: 8000
+  imagePullSecrets:
+    - name: regcredjson
+  volumes:
+    - name: cephfs-home
+      hostPath:
+        path: "/cephfs/abyss/home/name-space"    #DSC change for your namespace here
+        type: Directory
+    - name: cephfs-shared
+      hostPath:
+        path: "/cephfs/abyss/shared"
+        type: Directory
+    - name: cephfs-datasets
+      hostPath:
+        path: "/cephfs/abyss/datasets"
+        type: Directory
+
